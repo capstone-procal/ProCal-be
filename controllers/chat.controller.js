@@ -4,7 +4,6 @@ const Message = require("../models/Message");
 
 const chatController = {};
 
-// 1. 채팅방 생성 or 기존 채팅방 반환
 chatController.createOrGetRoom = async (req, res) => {
   try {
     const userId = req.userId;
@@ -30,7 +29,6 @@ chatController.createOrGetRoom = async (req, res) => {
   }
 };
 
-// 2. 특정 채팅방의 메시지 목록 조회
 chatController.getMessages = async (req, res) => {
   try {
     const { roomId } = req.params;
@@ -46,7 +44,6 @@ chatController.getMessages = async (req, res) => {
   }
 };
 
-// 3. 메시지 보내기
 chatController.sendMessage = async (req, res) => {
   try {
     const userId = req.userId;

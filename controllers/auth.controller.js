@@ -33,16 +33,13 @@ authController.authenticate = async (req, res, next) => {
 
     const token = tokenString.replace("Bearer ", "");
 
-    // ✅ 동기 방식으로 검증 (예외는 try/catch로 잡힘)
     const payload = jwt.verify(token, JWT_SECRET_KEY);
 
-    // 사용자 정보 주입
     req.userId = payload._id;
 
     const user = await User.findById(payload._id);
     if (!user) throw new Error("User not found");
-
-    // 관리자 여부 판단용
+   
     req.userLevel = user.level;
 
     next();

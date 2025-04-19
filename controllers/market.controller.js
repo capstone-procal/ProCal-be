@@ -3,7 +3,6 @@ const Market = require("../models/Market");
 
 const marketController = {};
 
-// 마켓 아이템 등록
 marketController.createItem = async (req, res) => {
   try {
     const userId = req.userId;
@@ -29,7 +28,6 @@ marketController.createItem = async (req, res) => {
   }
 };
 
-// 전체 마켓 아이템 조회
 marketController.getAllItems = async (req, res) => {
   try {
     const items = await Market.find({ isDeleted: false }).populate("userId", "name").sort({ createdAt: -1 });
@@ -39,7 +37,6 @@ marketController.getAllItems = async (req, res) => {
   }
 };
 
-// 단일 마켓 아이템 상세
 marketController.getItemById = async (req, res) => {
   try {
     const { itemId } = req.params;
@@ -57,7 +54,6 @@ marketController.getItemById = async (req, res) => {
   }
 };
 
-// 마켓 아이템 수정
 marketController.updateItem = async (req, res) => {
   try {
     const userId = req.userId;
@@ -90,7 +86,6 @@ marketController.updateItem = async (req, res) => {
   }
 };
 
-// 마켓 아이템 삭제
 marketController.deleteItem = async (req, res) => {
   try {
     const userId = req.userId;
