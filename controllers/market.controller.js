@@ -30,7 +30,9 @@ marketController.createItem = async (req, res) => {
 
 marketController.getAllItems = async (req, res) => {
   try {
-    const items = await Market.find({ isDeleted: false }).populate("userId", "name").sort({ createdAt: -1 });
+    // populate 제거
+    const items = await Market.find({ isDeleted: false }).sort({ createdAt: -1 });
+
     res.status(200).json({ status: "success", items });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
