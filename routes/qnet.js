@@ -14,32 +14,29 @@ router.get("/info", async (req, res) => {
         serviceKey: SERVICE_KEY,
         seriesCd: req.query.seriesCd || "03",
         pageNo: req.query.pageNo || 1,
-        numOfRows: Math.min(Number(req.query.numOfRows) || 3, 20),
+        numOfRows: req.query.numOfRows || 3,
       },
       responseType: "text",
     });
+
+    if (response.data.startsWith("<!DOCTYPE html")) {
+      throw new Error("Q-net 서버에서 HTML 에러 페이지가 응답됨");
+    }
 
     const jsonResult = await parseStringPromise(response.data, {
       explicitArray: false,
       trim: true,
     });
 
-    const header = jsonResult?.response?.header;
-    if (header?.resultCode !== "00") {
-      throw new Error(`Q-net 응답 실패: ${header?.resultMsg}`);
-    }
-
-    let items = jsonResult?.response?.body?.items?.item || [];
-    if (!Array.isArray(items)) {
-      items = [items];
-    }
+    const items = jsonResult?.response?.body?.items?.item || [];
 
     res.json(items);
   } catch (error) {
-    console.error("Q-net API 오류:", error.code || error.message);
+    console.error("Q-net API 오류:", error.message || error.code);
+
     res.status(500).json({
       error: "Q-net API 요청 실패",
-      detail: error.message,
+      detail: error.message || "알 수 없는 오류",
     });
   }
 });
