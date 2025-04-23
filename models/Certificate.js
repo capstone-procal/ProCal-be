@@ -9,7 +9,8 @@ const CertificateSchema = new mongoose.Schema({
       round:{ type: String },
       applicationStart: { type: Date },
       applicationEnd: { type: Date },
-      examDate: { type: Date },
+      examStart: { type: Date }, 
+      examEnd: { type: Date }, 
       resultDate: { type: Date }
     }
   ],
