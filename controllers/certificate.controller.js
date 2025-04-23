@@ -8,7 +8,7 @@ certificateController.createCertificate = async (req, res) => {
     const {
       name,
       category,
-      examDates,
+      schedule,
       eligibility,
       passingCriteria,
       officialSite
@@ -17,7 +17,7 @@ certificateController.createCertificate = async (req, res) => {
     const newCertificate = new Certificate({
       name,
       category,
-      examDates,
+      schedule,
       eligibility,
       passingCriteria,
       officialSite

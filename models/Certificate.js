@@ -3,11 +3,13 @@ const mongoose = require("mongoose");
 const CertificateSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
   category: [{ type: String, required: true }], 
-  examDates: [
+  schedule: [  
     {
-      type: { type: String, required: true },
-      startDate: { type: Date },
-      endDate: { type: Date }
+      type: { type: String, required: true },  
+      applicationStart: { type: Date },
+      applicationEnd: { type: Date },
+      examDate: { type: Date },
+      resultDate: { type: Date }
     }
   ],
   eligibility: { type: String, required: true },
