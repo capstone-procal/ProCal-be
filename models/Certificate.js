@@ -5,7 +5,8 @@ const CertificateSchema = new mongoose.Schema({
   category: [{ type: String, required: true }], 
   schedule: [  
     {
-      type: { type: String, required: true },  
+      type: { type: String, required: true }, 
+      round:{ type: String },
       applicationStart: { type: Date },
       applicationEnd: { type: Date },
       examDate: { type: Date },
