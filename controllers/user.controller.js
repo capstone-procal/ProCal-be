@@ -45,4 +45,27 @@ userController.getUser = async (req, res) => {
   }
 };
 
+userController.updateUser = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { name, nickname, email, password, profileImage } = req.body;
+
+    const updateFields = { name, nickname, email, profileImage };
+
+    if (password) {
+      const bcrypt = require("bcryptjs");
+      const salt = await bcrypt.genSalt(10);
+      updateFields.password = await bcrypt.hash(password, salt);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, { new: true }).select("-password");
+
+    if (!updatedUser) throw new Error("유저를 찾을 수 없습니다.");
+
+    res.status(200).json({ status: "success", user: updatedUser });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+};
+
 module.exports = userController;
