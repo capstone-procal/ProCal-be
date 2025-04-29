@@ -7,8 +7,9 @@ const app = express();
 require("dotenv").config();
 
 app.use(cors({
-  origin: "*", 
-  methods: ["GET", "POST"],       
+  origin: ["http://localhost:3000"], //프앤 배포시 추가
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],   
+  credentials: true,
 }));
 
 app.use(express.json());
