@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const certificateController = require("../controllers/certificate.controller");
-const authController = require("../controllers/auth.controller"); // ✅ 인증 미들웨어 추가
+const authController = require("../controllers/auth.controller"); 
 
 router.post(
   "/",
@@ -9,6 +9,14 @@ router.post(
   authController.checkAdminPermission,
   certificateController.createCertificate
 );
+
+router.get(
+  "/all",
+  authController.authenticate,
+  authController.checkAdminPermission,
+  certificateController.getAllCertificates
+);
+
 router.get("/", certificateController.getAllCertificates);
 router.get("/:id", certificateController.getCertificateById);
 router.put(
