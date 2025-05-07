@@ -3,7 +3,6 @@ const Reminder = require("../models/Reminder");
 
 const reminderController = {};
 
-// 찜 등록
 reminderController.createReminder = async (req, res) => {
   try {
     const userId = req.userId; 
@@ -29,7 +28,6 @@ reminderController.createReminder = async (req, res) => {
   }
 };
 
-// 내 찜 목록 조회
 reminderController.getUserReminders = async (req, res) => {
   try {
     const userId = req.userId; 
@@ -41,7 +39,33 @@ reminderController.getUserReminders = async (req, res) => {
   }
 };
 
-// 찜 삭제 (하트 해제)
+reminderController.updateReminder = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { reminderId } = req.params;
+    const { color } = req.body;
+
+    const allowedColors = ['#54b5e2', '#eeb5ec', '#fa7f12', '#f6e705', '#1aba25'];
+    if (!allowedColors.includes(color)) {
+      return res.status(400).json({ status: "fail", error: "허용되지 않은 색상입니다." });
+    }
+
+    const updated = await Reminder.findOneAndUpdate(
+      { _id: reminderId, userId },
+      { color },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ status: "fail", error: "Reminder not found" });
+    }
+
+    res.status(200).json({ status: "success", reminder: updated });
+  } catch (err) {
+    res.status(500).json({ status: "fail", error: err.message });
+  }
+};
+
 reminderController.deleteReminder = async (req, res) => {
   try {
     const userId = req.userId;

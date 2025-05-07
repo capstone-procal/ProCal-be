@@ -6,8 +6,7 @@ const ScheduleSchema = new mongoose.Schema({
   title: { type: String, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: false },
-  description: { type: String, default: "" },
-  color: { type: String, default: "#3498db" }
+  description: { type: String, default: "" }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Schedule", ScheduleSchema);

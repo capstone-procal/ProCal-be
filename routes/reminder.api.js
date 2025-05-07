@@ -8,6 +8,11 @@ router.post(
   authController.authenticate,
   reminderController.createReminder
 );
+router.put(
+  "/:reminderId",
+  authController.authenticate,
+  reminderController.updateReminder
+);
 router.get(
   "/",
   authController.authenticate,

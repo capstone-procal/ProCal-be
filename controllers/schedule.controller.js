@@ -5,7 +5,7 @@ const scheduleController = {};
 
 scheduleController.createSchedule = async (req, res) => {
   try {
-    const { title, startDate, endDate, description, certificateId, color } = req.body;
+    const { title, startDate, endDate, description, certificateId } = req.body;
     const userId = req.userId;
 
     if (!title || !startDate) {
@@ -26,8 +26,7 @@ scheduleController.createSchedule = async (req, res) => {
       startDate: new Date(startDate),
       endDate: endDate ? new Date(endDate) : null,
       description: description || "",
-      certificateId: certificateObjectId,
-      color: color || "#3498db"
+      certificateId: certificateObjectId
     });
 
     await newSchedule.save();
@@ -88,7 +87,7 @@ scheduleController.updateSchedule = async (req, res) => {
   try {
     const userId = req.userId;
     const { scheduleId } = req.params;
-    const { certificateId, color } = req.body;
+    const { certificateId } = req.body;
 
     let certificateObjectId = null;
     if (certificateId) {
@@ -98,14 +97,9 @@ scheduleController.updateSchedule = async (req, res) => {
       certificateObjectId = new mongoose.Types.ObjectId(certificateId);
     }
 
-    const allowedColors = ['#f94144', '#f3722c', '#f9c74f', '#90be6d', '#577590'];
-    if (color && !allowedColors.includes(color)) {
-      throw new Error("허용되지 않은 색상입니다.");
-    }
-
     const updateData = {
       ...req.body,
-      certificateId: certificateObjectId,
+      certificateId: certificateObjectId
     };
 
     const updatedSchedule = await Schedule.findOneAndUpdate(
