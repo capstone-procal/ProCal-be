@@ -88,7 +88,7 @@ scheduleController.updateSchedule = async (req, res) => {
   try {
     const userId = req.userId;
     const { scheduleId } = req.params;
-    const { certificateId } = req.body;
+    const { certificateId, color } = req.body;
 
     let certificateObjectId = null;
     if (certificateId) {
@@ -98,9 +98,19 @@ scheduleController.updateSchedule = async (req, res) => {
       certificateObjectId = new mongoose.Types.ObjectId(certificateId);
     }
 
+    const allowedColors = ['#f94144', '#f3722c', '#f9c74f', '#90be6d', '#577590'];
+    if (color && !allowedColors.includes(color)) {
+      throw new Error("허용되지 않은 색상입니다.");
+    }
+
+    const updateData = {
+      ...req.body,
+      certificateId: certificateObjectId,
+    };
+
     const updatedSchedule = await Schedule.findOneAndUpdate(
       { _id: scheduleId, userId },
-      { ...req.body, certificateId: certificateObjectId },
+      updateData,
       { new: true }
     );
 
