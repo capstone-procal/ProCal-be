@@ -3,15 +3,14 @@ const Reminder = require("../models/Reminder");
 
 const reminderController = {};
 
+const ALLOWED_COLORS = ['#54b5e2', '#eeb5ec', '#fa7f12', '#f6e705', '#1aba25'];
+
 reminderController.createReminder = async (req, res) => {
   try {
-    const userId = req.userId; 
-    const { certificateId } = req.body;
+    const userId = req.userId;
+    const { certificateId, color } = req.body;
 
-    if (!certificateId) {
-      throw new Error("CertificateId is required");
-    }
-
+    if (!certificateId) throw new Error("CertificateId is required");
     if (!mongoose.Types.ObjectId.isValid(certificateId)) {
       throw new Error("Invalid certificateId format");
     }
@@ -19,7 +18,14 @@ reminderController.createReminder = async (req, res) => {
     const existing = await Reminder.findOne({ userId, certificateId });
     if (existing) throw new Error("Already added to reminders");
 
-    const newReminder = new Reminder({ userId, certificateId });
+    const validColor = ALLOWED_COLORS.includes(color) ? color : undefined;
+
+    const newReminder = new Reminder({
+      userId,
+      certificateId,
+      ...(validColor && { color: validColor })
+    });
+
     await newReminder.save();
 
     res.status(201).json({ status: "success", reminder: newReminder });
@@ -30,9 +36,8 @@ reminderController.createReminder = async (req, res) => {
 
 reminderController.getUserReminders = async (req, res) => {
   try {
-    const userId = req.userId; 
+    const userId = req.userId;
     const reminders = await Reminder.find({ userId }).populate("certificateId");
-
     res.status(200).json({ status: "success", reminders });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
@@ -45,8 +50,7 @@ reminderController.updateReminder = async (req, res) => {
     const { reminderId } = req.params;
     const { color } = req.body;
 
-    const allowedColors = ['#54b5e2', '#eeb5ec', '#fa7f12', '#f6e705', '#1aba25'];
-    if (!allowedColors.includes(color)) {
+    if (!ALLOWED_COLORS.includes(color)) {
       return res.status(400).json({ status: "fail", error: "허용되지 않은 색상입니다." });
     }
 
