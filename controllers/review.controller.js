@@ -65,10 +65,10 @@ reviewController.getReviewById = async (req, res) => {
 reviewController.createReview = async (req, res) => {
   try {
     const userId = req.userId;
-    const { certificateId, content, difficulty } = req.body;
+    const { certificateId, content, difficulty, category } = req.body;
 
-    if (!certificateId || !content || difficulty === undefined) {
-      throw new Error("CertificateId, content, and difficulty are required");
+    if (!certificateId || !content || difficulty === undefined || !category) {
+      throw new Error("CertificateId, content, difficulty, and category are required");
     }
 
     if (!mongoose.Types.ObjectId.isValid(certificateId)) {
@@ -82,7 +82,7 @@ reviewController.createReview = async (req, res) => {
       throw new Error("Difficulty must be between 1 and 5");
     }
 
-    const newReview = new Review({ userId, certificateId, content, difficulty });
+    const newReview = new Review({ userId, certificateId, content, difficulty, category });
     await newReview.save();
 
     await updateCertificateDifficulty(certificateId, difficulty);
