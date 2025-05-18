@@ -7,7 +7,7 @@ const app = express();
 require("dotenv").config();
 
 app.use(cors({
-  origin: ["http://localhost:3000"], //프앤 배포시 추가
+  origin: ["https://capstone-procal.netlify.app"], //프앤 배포시 추가
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],   
   credentials: true,
 }));
