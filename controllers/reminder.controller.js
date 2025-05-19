@@ -73,9 +73,9 @@ reminderController.updateReminder = async (req, res) => {
 reminderController.deleteReminder = async (req, res) => {
   try {
     const userId = req.userId;
-    const { certificateId } = req.params;
+    const { reminderId } = req.params;
 
-    const deletedReminder = await Reminder.findOneAndDelete({ certificateId, userId });
+    const deletedReminder = await Reminder.findOneAndDelete({ _id: reminderId, userId });
     if (!deletedReminder) throw new Error("Reminder not found");
 
     res.status(200).json({ status: "success", message: "Reminder deleted" });

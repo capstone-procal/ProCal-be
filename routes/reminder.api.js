@@ -19,7 +19,7 @@ router.get(
   reminderController.getUserReminders
 );
 router.delete(
-  "/:certificateId",
+  "/:reminderId",
   authController.authenticate,
   reminderController.deleteReminder
 );
