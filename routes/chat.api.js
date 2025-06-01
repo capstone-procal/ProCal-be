@@ -8,16 +8,19 @@ router.post(
   authController.authenticate,
   chatController.createOrGetRoom
 );
+
 router.get(
-  "/room/:roomId",
+  "/messages/:roomId",
   authController.authenticate,
   chatController.getMessages
 );
+
 router.post(
   "/message",
   authController.authenticate,
   chatController.sendMessage
 );
+
 router.get(
   "/conversations",
   authController.authenticate,

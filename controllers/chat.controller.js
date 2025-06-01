@@ -38,7 +38,7 @@ chatController.getMessages = async (req, res) => {
     }
 
     const messages = await Message.find({ roomId })
-      .populate("senderId", "name")
+      .populate("senderId", "nickname")
       .sort({ createdAt: 1 });
 
     res.status(200).json({ status: "success", messages });
