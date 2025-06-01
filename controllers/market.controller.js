@@ -30,7 +30,9 @@ marketController.createItem = async (req, res) => {
 
 marketController.getAllItems = async (req, res) => {
   try {
-    const items = await Market.find({ isDeleted: false }).sort({ createdAt: -1 });
+    const items = await Market.find({ isDeleted: false })
+      .populate("userId", "nickname profileImage") 
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ status: "success", items });
   } catch (err) {
@@ -46,7 +48,9 @@ marketController.getItemById = async (req, res) => {
       throw new Error("Invalid itemId format");
     }
 
-    const item = await Market.findById(itemId).populate("userId", "name");
+    const item = await Market.findById(itemId)
+      .populate("userId", "nickname profileImage"); 
+
     if (!item || item.isDeleted) throw new Error("Item not found");
 
     res.status(200).json({ status: "success", item });
