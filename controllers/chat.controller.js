@@ -9,7 +9,7 @@ chatController.createOrGetRoom = async (req, res) => {
     const userId = req.userId;
     const { opponentId, marketId } = req.body;
 
-    if (!opponentId || !marketId) throw new Error("상대방과 마켓 ID는 필수입니다.");
+    if (!opponentId || !marketId) throw new Error("error");
 
     let room = await ChatRoom.findOne({
       $or: [
@@ -37,7 +37,10 @@ chatController.getMessages = async (req, res) => {
       throw new Error("Invalid roomId");
     }
 
-    const messages = await Message.find({ roomId }).populate("senderId", "name").sort({ createdAt: 1 });
+    const messages = await Message.find({ roomId })
+      .populate("senderId", "name")
+      .sort({ createdAt: 1 });
+
     res.status(200).json({ status: "success", messages });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
@@ -49,7 +52,7 @@ chatController.sendMessage = async (req, res) => {
     const userId = req.userId;
     const { roomId, text } = req.body;
 
-    if (!text || !roomId) throw new Error("roomId와 text는 필수입니다.");
+    if (!text || !roomId) throw new Error("error");
 
     const message = new Message({ roomId, senderId: userId, text });
     await message.save();
