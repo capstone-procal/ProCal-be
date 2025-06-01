@@ -63,4 +63,32 @@ chatController.sendMessage = async (req, res) => {
   }
 };
 
+chatController.getConversations = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const rooms = await ChatRoom.find({
+      $or: [{ userA: userId }, { userB: userId }],
+    })
+      .populate("userA", "nickname")
+      .populate("userB", "nickname")
+      .populate("marketId", "title")
+      .sort({ updatedAt: -1 });
+
+    const conversations = rooms.map((room) => {
+      const otherUser =
+        String(room.userA._id) === userId ? room.userB : room.userA;
+      return {
+        _id: room._id,
+        marketTitle: room.marketId?.title || "",
+        otherUser,
+      };
+    });
+
+    res.status(200).json({ status: "success", conversations });
+  } catch (err) {
+    res.status(400).json({ status: "fail", error: err.message });
+  }
+};
+
 module.exports = chatController;

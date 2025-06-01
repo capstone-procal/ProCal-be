@@ -18,5 +18,10 @@ router.post(
   authController.authenticate,
   chatController.sendMessage
 );
+router.get(
+  "/conversations",
+  authController.authenticate,
+  chatController.getConversations
+);
 
 module.exports = router;
