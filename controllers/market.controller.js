@@ -86,6 +86,7 @@ marketController.updateItem = async (req, res) => {
     if (status !== undefined) item.status = status;
 
     await item.save();
+    await item.populate("userId", "nickname profileImage");
     res.status(200).json({ status: "success", item });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
