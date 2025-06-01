@@ -77,7 +77,7 @@ marketController.updateItem = async (req, res) => {
     if (title !== undefined) item.title = title;
     if (description !== undefined) item.description = description;
     if (price !== undefined) item.price = price;
-    if (images !== undefined) item.images = image;
+    if (images !== undefined) item.images = images;
     if (status !== undefined) item.status = status;
 
     await item.save();
