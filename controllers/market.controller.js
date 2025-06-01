@@ -22,6 +22,7 @@ marketController.createItem = async (req, res) => {
     });
 
     await newItem.save();
+    await newItem.populate("userId", "nickname profileImage");
     res.status(201).json({ status: "success", item: newItem });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
