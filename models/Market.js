@@ -5,7 +5,7 @@ const MarketSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
-  image: { type: String },
+  images: [{ type: String }],
   status: { type: String, enum: ["판매중", "판매완료"], default: "판매중" },
   isDeleted: { type: Boolean, default: false }
 }, { timestamps: true });

@@ -6,7 +6,7 @@ const marketController = {};
 marketController.createItem = async (req, res) => {
   try {
     const userId = req.userId;
-    const { title, description, price, image, status } = req.body;
+    const { title, description, price, images, status } = req.body;
 
     if (!title || !description || !price) {
       throw new Error("title, description, price는 필수입니다.");
@@ -17,7 +17,7 @@ marketController.createItem = async (req, res) => {
       title,
       description,
       price,
-      image,
+      images,
       status
     });
 
@@ -30,7 +30,6 @@ marketController.createItem = async (req, res) => {
 
 marketController.getAllItems = async (req, res) => {
   try {
-    // populate 제거
     const items = await Market.find({ isDeleted: false }).sort({ createdAt: -1 });
 
     res.status(200).json({ status: "success", items });
@@ -61,7 +60,7 @@ marketController.updateItem = async (req, res) => {
     const userId = req.userId;
     const userLevel = req.userLevel;
     const { itemId } = req.params;
-    const { title, description, price, image, status } = req.body;
+    const { title, description, price, images, status } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(itemId)) {
       throw new Error("Invalid itemId format");
@@ -78,7 +77,7 @@ marketController.updateItem = async (req, res) => {
     if (title !== undefined) item.title = title;
     if (description !== undefined) item.description = description;
     if (price !== undefined) item.price = price;
-    if (image !== undefined) item.image = image;
+    if (images !== undefined) item.images = image;
     if (status !== undefined) item.status = status;
 
     await item.save();
