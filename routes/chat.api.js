@@ -27,4 +27,10 @@ router.get(
   chatController.getConversations
 );
 
+router.delete(
+  "/room/:roomId",
+  authController.authenticate,
+  chatController.deleteRoom
+);
+
 module.exports = router;

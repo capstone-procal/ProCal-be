@@ -91,4 +91,17 @@ chatController.getConversations = async (req, res) => {
   }
 };
 
+chatController.deleteRoom = async (req, res) => {
+  try {
+    const { roomId } = req.params;
+
+    await Message.deleteMany({ roomId });
+    await ChatRoom.findByIdAndDelete(roomId);
+
+    res.status(200).json({ status: "success", message: "error" });
+  } catch (err) {
+    res.status(400).json({ status: "fail", error: err.message });
+  }
+};
+
 module.exports = chatController;
