@@ -23,7 +23,13 @@ postController.createPost = async (req, res) => {
 
 postController.getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find({ isDeleted: false }).populate("userId", "name");
+    const { category } = req.query;
+    const filter = { isDeleted: false };
+    if (category && ["질문", "자유", "to관리자"].includes(category)) {
+      filter.category = category;
+    }
+
+    const posts = await Post.find(filter).populate("userId", "name");
     res.status(200).json({ status: "success", posts });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
