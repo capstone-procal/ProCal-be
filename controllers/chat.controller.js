@@ -32,10 +32,16 @@ chatController.createOrGetRoom = async (req, res) => {
 chatController.getMessages = async (req, res) => {
   try {
     const { roomId } = req.params;
+    const userId = req.userId;
 
     if (!mongoose.Types.ObjectId.isValid(roomId)) {
       throw new Error("Invalid roomId");
     }
+
+    await Message.updateMany(
+      { roomId, senderId: { $ne: userId }, isRead: false },
+      { $set: { isRead: true } }
+    );
 
     const messages = await Message.find({ roomId })
       .populate("senderId", "nickname")
@@ -54,7 +60,7 @@ chatController.sendMessage = async (req, res) => {
 
     if (!text || !roomId) throw new Error("error");
 
-    const message = new Message({ roomId, senderId: userId, text });
+    const message = new Message({ roomId, senderId: userId, text, isRead: false });
     await message.save();
 
     await ChatRoom.findByIdAndUpdate(roomId, { updatedAt: new Date() });
@@ -77,20 +83,22 @@ chatController.getConversations = async (req, res) => {
       .populate("marketId", "title")
       .sort({ updatedAt: -1 });
 
-    const conversations = await Promise.all(rooms.map(async (room) => {
-      const lastMessage = await Message.findOne({ roomId: room._id })
-        .sort({ createdAt: -1 })
-        .lean();
+    const conversations = await Promise.all(
+      rooms.map(async (room) => {
+        const otherUser = String(room.userA._id) === userId ? room.userB : room.userA;
 
-      const otherUser = String(room.userA._id) === userId ? room.userB : room.userA;
+        const lastMessage = await Message.findOne({ roomId: room._id })
+          .sort({ createdAt: -1 })
+          .lean();
 
-      return {
-        _id: room._id,
-        marketTitle: room.marketId?.title || "",
-        otherUser,
-        lastMessage,
-      };
-    }));
+        return {
+          _id: room._id,
+          marketTitle: room.marketId?.title || "",
+          otherUser,
+          lastMessage,
+        };
+      })
+    );
 
     res.status(200).json({ status: "success", conversations });
   } catch (err) {
@@ -105,7 +113,7 @@ chatController.deleteRoom = async (req, res) => {
     await Message.deleteMany({ roomId });
     await ChatRoom.findByIdAndDelete(roomId);
 
-    res.status(200).json({ status: "success", message: "deleted" });
+    res.status(200).json({ status: "success", message: "삭제 완료" });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
   }
