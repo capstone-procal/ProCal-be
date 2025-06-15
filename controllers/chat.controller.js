@@ -39,8 +39,12 @@ chatController.getMessages = async (req, res) => {
     }
 
     await Message.updateMany(
-      { roomId, senderId: { $ne: userId }, isRead: false },
-      { $set: { isRead: true } }
+      {
+        roomId,
+        isRead: false,
+        senderId: { $ne: userId },
+      },
+      { isRead: true }
     );
 
     const messages = await Message.find({ roomId })
@@ -63,8 +67,6 @@ chatController.sendMessage = async (req, res) => {
     const message = new Message({ roomId, senderId: userId, text, isRead: false });
     await message.save();
 
-    await ChatRoom.findByIdAndUpdate(roomId, { updatedAt: new Date() });
-
     res.status(201).json({ status: "success", message });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
@@ -85,11 +87,11 @@ chatController.getConversations = async (req, res) => {
 
     const conversations = await Promise.all(
       rooms.map(async (room) => {
-        const otherUser = String(room.userA._id) === userId ? room.userB : room.userA;
-
         const lastMessage = await Message.findOne({ roomId: room._id })
           .sort({ createdAt: -1 })
           .lean();
+
+        const otherUser = String(room.userA._id) === userId ? room.userB : room.userA;
 
         return {
           _id: room._id,
@@ -113,7 +115,7 @@ chatController.deleteRoom = async (req, res) => {
     await Message.deleteMany({ roomId });
     await ChatRoom.findByIdAndDelete(roomId);
 
-    res.status(200).json({ status: "success", message: "삭제 완료" });
+    res.status(200).json({ status: "success", message: "Room deleted" });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
   }
