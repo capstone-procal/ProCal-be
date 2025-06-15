@@ -11,7 +11,6 @@ const commentApi = require("./comment.api");
 const reviewApi = require("./review.api");
 const marketApi = require("./market.api");
 const chatApi = require("./chat.api");
-//const qnetApi = require("./qnet");
 
 router.use("/user", userApi);
 router.use("/auth", authApi);
@@ -23,6 +22,5 @@ router.use("/post", postApi);
 router.use("/comment", commentApi);
 router.use("/market", marketApi);
 router.use("/chat", chatApi);
-//router.use("/qnet", qnetApi);
 
 module.exports = router;
