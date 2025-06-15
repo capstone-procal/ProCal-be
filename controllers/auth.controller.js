@@ -31,7 +31,6 @@ authController.loginWithEmail = async (req, res) => {
   }
 };
 
-// 인증 미들웨어
 authController.authenticate = async (req, res, next) => {
   try {
     const tokenString = req.headers.authorization;
@@ -40,11 +39,8 @@ authController.authenticate = async (req, res, next) => {
     const token = tokenString.replace("Bearer ", "");
     const payload = jwt.verify(token, JWT_SECRET_KEY);
 
-    const user = await User.findById(payload._id);
-    if (!user) throw new Error("사용자를 찾을 수 없습니다.");
-
     req.userId = payload._id;
-    req.userLevel = user.level;
+    req.userLevel = payload.level;
 
     next();
   } catch (error) {

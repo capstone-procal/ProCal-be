@@ -25,7 +25,7 @@ userSchema.methods.toJSON = function () {
 };
 
 userSchema.methods.generateToken = async function () {
-  const token = jwt.sign({ _id: this.id }, JWT_SECRET_KEY, {
+  const token = jwt.sign({ _id: this.id, level: this.level, }, JWT_SECRET_KEY, {
     expiresIn: "1d",
   });
   return token;

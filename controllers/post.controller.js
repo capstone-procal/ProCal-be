@@ -50,6 +50,7 @@ postController.getPostById = async (req, res) => {
 postController.updatePost = async (req, res) => {
   try {
     const userId = req.userId;
+    const userLevel = req.userLevel;
     const { postId } = req.params;
     const { title, category, content } = req.body;
 
@@ -57,15 +58,21 @@ postController.updatePost = async (req, res) => {
       throw new Error("Invalid postId format");
     }
 
-    const updatedPost = await Post.findOneAndUpdate(
-      { _id: postId, userId },
-      { title, category, content },
-      { new: true }
-    );
+    const post = await Post.findById(postId);
+    if (!post || post.isDeleted) throw new Error("Post not found");
 
-    if (!updatedPost) throw new Error("Post not found or no permission");
+    const isOwner = String(post.userId) === userId;
+    const isAdmin = userLevel === "admin";
 
-    res.status(200).json({ status: "success", post: updatedPost });
+    if (!isOwner && !isAdmin) throw new Error("No permission to update");
+
+    post.title = title;
+    post.category = category;
+    post.content = content;
+
+    await post.save();
+
+    res.status(200).json({ status: "success", post });
   } catch (err) {
     res.status(400).json({ status: "fail", error: err.message });
   }
@@ -74,19 +81,23 @@ postController.updatePost = async (req, res) => {
 postController.deletePost = async (req, res) => {
   try {
     const userId = req.userId;
+    const userLevel = req.userLevel; 
     const { postId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(postId)) {
       throw new Error("Invalid postId format");
     }
 
-    const deletedPost = await Post.findOneAndUpdate(
-      { _id: postId, userId },
-      { isDeleted: true },
-      { new: true }
-    );
+    const post = await Post.findById(postId);
+    if (!post) throw new Error("Post not found");
 
-    if (!deletedPost) throw new Error("Post not found or no permission");
+    const isOwner = String(post.userId) === userId;
+    const isAdmin = userLevel === "admin";
+
+    if (!isOwner && !isAdmin) throw new Error("No permission to delete");
+
+    post.isDeleted = true;
+    await post.save();
 
     res.status(200).json({ status: "success", message: "Post deleted" });
   } catch (err) {
