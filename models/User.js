@@ -17,7 +17,6 @@ const userSchema = Schema(
   { timestamps: true }
 );
 
-// 비밀번호 제거
 userSchema.methods.toJSON = function () {
   const obj = this._doc;
   delete obj.password;
@@ -25,7 +24,6 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 
-// JWT 토큰 생성
 userSchema.methods.generateToken = async function () {
   const token = jwt.sign({ _id: this.id }, JWT_SECRET_KEY, {
     expiresIn: "1d",
