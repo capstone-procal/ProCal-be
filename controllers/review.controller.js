@@ -2,9 +2,13 @@ const mongoose = require("mongoose");
 const Review = require("../models/Review");
 const Certificate = require("../models/Certificate");
 
-const updateCertificateDifficulty = async (certificateId, difficultyChange, isDelete = false) => {
+const updateCertificateDifficulty = async (
+  certificateId,
+  difficultyChange,
+  isDelete = false
+) => {
   const certificate = await Certificate.findById(certificateId);
-  
+
   if (!certificate) return;
 
   let { totalDifficulty, reviewCount } = certificate;
@@ -19,10 +23,10 @@ const updateCertificateDifficulty = async (certificateId, difficultyChange, isDe
 
   const averageDifficulty = reviewCount > 0 ? totalDifficulty / reviewCount : 0;
 
-  await Certificate.findByIdAndUpdate(certificateId, { 
-    totalDifficulty, 
-    reviewCount, 
-    averageDifficulty 
+  await Certificate.findByIdAndUpdate(certificateId, {
+    totalDifficulty,
+    reviewCount,
+    averageDifficulty,
   });
 };
 
@@ -36,7 +40,10 @@ reviewController.getReviewsByCertificate = async (req, res) => {
       throw new Error("Invalid certificateId format");
     }
 
-    const reviews = await Review.find({ certificateId, isDeleted: false }).populate("userId", "name");
+    const reviews = await Review.find({
+      certificateId,
+      isDeleted: false,
+    }).populate("userId", "name");
 
     res.status(200).json({ status: "success", reviews });
   } catch (err) {
@@ -68,7 +75,9 @@ reviewController.createReview = async (req, res) => {
     const { certificateId, content, difficulty, category } = req.body;
 
     if (!certificateId || !content || difficulty === undefined || !category) {
-      throw new Error("CertificateId, content, difficulty, and category are required");
+      throw new Error(
+        "CertificateId, content, difficulty, and category are required"
+      );
     }
 
     if (!mongoose.Types.ObjectId.isValid(certificateId)) {
@@ -82,7 +91,13 @@ reviewController.createReview = async (req, res) => {
       throw new Error("Difficulty must be between 1 and 5");
     }
 
-    const newReview = new Review({ userId, certificateId, content, difficulty, category });
+    const newReview = new Review({
+      userId,
+      certificateId,
+      content,
+      difficulty,
+      category,
+    });
     await newReview.save();
 
     await updateCertificateDifficulty(certificateId, difficulty);
@@ -96,6 +111,7 @@ reviewController.createReview = async (req, res) => {
 reviewController.updateReview = async (req, res) => {
   try {
     const userId = req.userId;
+    const userRole = req.userRole; 
     const { reviewId } = req.params;
     const { content, difficulty } = req.body;
 
@@ -104,18 +120,31 @@ reviewController.updateReview = async (req, res) => {
     }
 
     const existingReview = await Review.findById(reviewId);
-    if (!existingReview || existingReview.userId.toString() !== userId) {
-      throw new Error("Review not found or no permission");
+    if (!existingReview) {
+      throw new Error("Review not found");
+    }
+
+    const isOwner = existingReview.userId.toString() === userId;
+    const isAdmin = userRole === "admin";
+
+    if (!isOwner && !isAdmin) {
+      throw new Error("No permission to edit this review");
     }
 
     const oldDifficulty = existingReview.difficulty;
 
-    existingReview.content = content || existingReview.content;
-    existingReview.difficulty = difficulty || oldDifficulty;
+    existingReview.content = content ?? existingReview.content;
+    existingReview.difficulty = difficulty ?? oldDifficulty;
     await existingReview.save();
 
-    if (difficulty !== undefined && difficulty !== oldDifficulty) {
-      await updateCertificateDifficulty(existingReview.certificateId, difficulty - oldDifficulty);
+    if (
+      typeof difficulty === "number" &&
+      difficulty !== oldDifficulty
+    ) {
+      await updateCertificateDifficulty(
+        existingReview.certificateId,
+        difficulty - oldDifficulty
+      );
     }
 
     res.status(200).json({ status: "success", review: existingReview });
@@ -127,25 +156,43 @@ reviewController.updateReview = async (req, res) => {
 reviewController.deleteReview = async (req, res) => {
   try {
     const userId = req.userId;
+    const userRole = req.userRole; 
     const { reviewId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(reviewId)) {
       throw new Error("Invalid reviewId format");
     }
 
-    const review = await Review.findOneAndUpdate(
-      { _id: reviewId, userId },
-      { isDeleted: true },
-      { new: true }
+    const review = await Review.findById(reviewId);
+    if (!review || review.isDeleted) {
+      throw new Error("Review not found");
+    }
+
+    const isOwner = review.userId.toString() === userId;
+    const isAdmin = userRole === "admin";
+
+    if (!isOwner && !isAdmin) {
+      throw new Error("No permission to delete this review");
+    }
+
+    review.isDeleted = true;
+    await review.save();
+
+    await updateCertificateDifficulty(
+      review.certificateId,
+      -review.difficulty,
+      true
     );
 
-    if (!review) throw new Error("Review not found or no permission");
-
-    await updateCertificateDifficulty(review.certificateId, -review.difficulty, true);
-
-    res.status(200).json({ status: "success", message: "Review marked as deleted" });
+    res.status(200).json({
+      status: "success",
+      message: "Review marked as deleted",
+    });
   } catch (err) {
-    res.status(400).json({ status: "fail", error: err.message });
+    res.status(400).json({
+      status: "fail",
+      error: err.message,
+    });
   }
 };
 
