@@ -8,7 +8,6 @@ const updateCertificateDifficulty = async (
   isDelete = false
 ) => {
   const certificate = await Certificate.findById(certificateId);
-
   if (!certificate) return;
 
   let { totalDifficulty, reviewCount } = certificate;
@@ -111,7 +110,7 @@ reviewController.createReview = async (req, res) => {
 reviewController.updateReview = async (req, res) => {
   try {
     const userId = req.userId;
-    const userRole = req.userRole; 
+    const userRole = req.userLevel; 
     const { reviewId } = req.params;
     const { content, difficulty } = req.body;
 
@@ -156,7 +155,7 @@ reviewController.updateReview = async (req, res) => {
 reviewController.deleteReview = async (req, res) => {
   try {
     const userId = req.userId;
-    const userRole = req.userRole; 
+    const userRole = req.userLevel; 
     const { reviewId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(reviewId)) {
