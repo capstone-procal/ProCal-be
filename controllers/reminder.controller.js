@@ -3,7 +3,7 @@ const Reminder = require("../models/Reminder");
 
 const reminderController = {};
 
-const ALLOWED_COLORS = ['#54b5e2', '#eeb5ec', '#fa7f12', '#f6e705', '#1aba25'];
+const ALLOWED_COLORS = ['#fff1ff', '#fff0cf', '#d0f3e1', '#d4f1ff', '#cfd0fe'];
 
 reminderController.createReminder = async (req, res) => {
   try {
