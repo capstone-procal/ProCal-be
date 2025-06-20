@@ -33,4 +33,10 @@ router.delete(
   chatController.deleteRoom
 );
 
+router.patch(
+  "/room/:roomId/read",
+  authController.authenticate,
+  chatController.markAsRead
+);
+
 module.exports = router;

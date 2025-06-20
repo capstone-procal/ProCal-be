@@ -121,4 +121,28 @@ chatController.deleteRoom = async (req, res) => {
   }
 };
 
+chatController.markAsRead = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { roomId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(roomId)) {
+      throw new Error("Invalid roomId");
+    }
+
+    await Message.updateMany(
+      {
+        roomId,
+        isRead: false,
+        senderId: { $ne: userId }, 
+      },
+      { isRead: true }
+    );
+
+    res.status(200).json({ status: "success" });
+  } catch (err) {
+    res.status(400).json({ status: "fail", error: err.message });
+  }
+};
+
 module.exports = chatController;
